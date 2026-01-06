@@ -15,7 +15,7 @@ export default function HomePage() {
                 <Briefcase className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold tracking-tight text-foreground">Job Service Jenkins</h1>
+                <h1 className="text-xl font-semibold tracking-tight text-foreground">Job Service</h1>
                 <p className="text-xs text-muted-foreground">Find your next opportunity</p>
               </div>
             </div>
