@@ -80,7 +80,10 @@ pipeline {
                 """
             }
         }
-        post {
+
+    }
+
+    post {
             success {
                 withCredentials([
                     string(credentialsId: 'TELEGRAM_BOT_TOKEN', variable: 'BOT_TOKEN'),
@@ -101,6 +104,4 @@ pipeline {
                 }
             }
         }
-
-    }
 }
