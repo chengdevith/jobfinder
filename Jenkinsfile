@@ -106,19 +106,46 @@ pipeline {
     }
     post {
         success {
+            // ✅ TELEGRAM
+            withCredentials([
+                string(credentialsId: 'TELEGRAM_BOT_TOKEN', variable: 'BOT_TOKEN'),
+                string(credentialsId: 'TELEGRAM_CHAT_ID', variable: 'CHAT_ID')
+            ]) {
+                sh """
+                curl -s -X POST https://api.telegram.org/bot${BOT_TOKEN}/sendMessage \
+                  -d chat_id=${CHAT_ID} \
+                  -d parse_mode=Markdown \
+                  -d text="✅ *Job SUCCESS*
+
+                *Project:* JobFinder Frontend
+                *Job:* ${JOB_NAME}
+                *Build:* #${BUILD_NUMBER}
+                *SonarQube:* Quality Gate PASSED 🎯"
+                """
+            }
+
+            // ✅ EMAIL
             emailext(
                 subject: "✅ SUCCESS: ${JOB_NAME} #${BUILD_NUMBER}",
                 to: "chengdevith5@gmail.com",
                 mimeType: 'text/html',
                 body: """
                 <h2>Build Success 🎉</h2>
+                <p><b>Project:</b> JobFinder Frontend</p>
                 <p><b>Job:</b> ${JOB_NAME}</p>
                 <p><b>Build:</b> #${BUILD_NUMBER}</p>
                 <p><a href="${BUILD_URL}">View Build</a></p>
                 """
             )
         }
-    }
 
+        failure {
+            emailext(
+                subject: "❌ FAILED: ${JOB_NAME} #${BUILD_NUMBER}",
+                to: "chengdevith5@gmail.com",
+                body: "Build failed ❌\n\nCheck console: ${BUILD_URL}"
+            )
+        }
+    }
     
 }
