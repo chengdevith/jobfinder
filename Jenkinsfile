@@ -8,9 +8,22 @@ pipeline {
     }
     tools {
         nodejs 'node-v24-lts'
-        maven 'maven'
     }
     stages {
+        stage('Clone') {
+            steps {
+                git branch: 'main', url: 'https://github.com/chengdevith/jobfinder.git'
+                sh 'ls -lrt'
+            }
+        }
+        stage('Run Test') {
+            steps {
+                sh """
+                    npm ci
+                    npm run test:ci
+                """
+            }
+        }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
