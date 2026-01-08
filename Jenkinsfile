@@ -103,5 +103,22 @@ pipeline {
                     """
                 }
             }
+    }
+    post {
+        success {
+            emailext(
+                subject: "✅ SUCCESS: ${JOB_NAME} #${BUILD_NUMBER}",
+                to: "chengdevith5@gmail.com",
+                mimeType: 'text/html',
+                body: """
+                <h2>Build Success 🎉</h2>
+                <p><b>Job:</b> ${JOB_NAME}</p>
+                <p><b>Build:</b> #${BUILD_NUMBER}</p>
+                <p><a href="${BUILD_URL}">View Build</a></p>
+                """
+            )
         }
+    }
+
+    
 }
