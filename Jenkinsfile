@@ -6,6 +6,7 @@ pipeline {
         TAG = 'latest'
         FULL_IMAGE = "${REPO_NAME}/${IMAGE_NAME}:${TAG}"
     }
+    
     tools {
         nodejs 'node-v24-lts'
     }
