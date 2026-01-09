@@ -10,6 +10,7 @@ pipeline {
     tools {
         nodejs 'node-v24-lts'
     }
+    stages {
         stage('Run Test') {
             steps {
                 sh """
@@ -115,11 +116,9 @@ pipeline {
                         -X POST \
                         -d '{
                         "username": "Jenkins",
-                        "content": "✅ **Job SUCCESS** 🚀\\n\\n\
-                        **Project:** JobFinder Frontend\\n\
+                        "content": "❌ **Job FAILED**\\n\\n\
                         **Job:** ${JOB_NAME}\\n\
                         **Build:** #${BUILD_NUMBER}\\n\
-                        **SonarQube:** Quality Gate PASSED 🎯\\n\
                         🔗 ${BUILD_URL}"
                                 }' \
                                 ${DISCORD_WEBHOOK}
