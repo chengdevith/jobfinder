@@ -13,11 +13,16 @@ pipeline {
     stages {
         stage('Run Test') {
             steps {
-                sh """
-                    npm ci
-                    npm run test:ci
-                """
-            }
+                script {
+                    if (params.RUN_TEST) {
+                        sh """
+                        npm ci
+                        npm run test:ci
+                        """
+                    } else {
+                        echo "Skip Run Test stage"
+                    }
+                }
         }
         stage('SonarQube Analysis') {
             steps {
