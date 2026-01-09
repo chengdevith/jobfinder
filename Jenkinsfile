@@ -113,18 +113,72 @@ pipeline {
                 ]) {
                     sh """
                     curl -H "Content-Type: application/json" \
-                        -X POST \
-                        -d '{
-                        "username": "Jenkins",
-                        "content": "❌ **Job FAILED**\\n\\n\
-                        **Job:** ${JOB_NAME}\\n\
-                        **Build:** #${BUILD_NUMBER}\\n\
-                        🔗 ${BUILD_URL}"
-                                }' \
-                                ${DISCORD_WEBHOOK}
+                    -X POST \
+                    -d '{
+                    "username": "Jenkins",
+                    "content": "✅ **Job SUCCESS** 🚀\\n\\n\
+                    **Project:** JobFinder Frontend\\n\
+                    **Job:** ${JOB_NAME}\\n\
+                    **Build:** #${BUILD_NUMBER}\\n\
+                    **SonarQube:** Quality Gate PASSED 🎯\\n\
+                    🔗 ${BUILD_URL}"
+                    }' \
+                    ${DISCORD_WEBHOOK}
                     """
                 }
 
+            }
+            failure {
+
+                /* Telegram */
+                withCredentials([
+                    string(credentialsId: 'TELEGRAM_BOT_TOKEN', variable: 'BOT_TOKEN'),
+                    string(credentialsId: 'TELEGRAM_CHAT_ID', variable: 'CHAT_ID')
+                ]) {
+                    sh """
+                    curl -s -X POST https://api.telegram.org/bot${BOT_TOKEN}/sendMessage \
+                    -d chat_id=${CHAT_ID} \
+                    -d parse_mode=Markdown \
+                    -d text="❌ *Job FAILED*
+                    *Project:* JobFinder Frontend
+                    *Job:* ${JOB_NAME}
+                    *Build:* #${BUILD_NUMBER}
+                    *Status:* FAILED 💥
+                    🔗 ${BUILD_URL}"
+                    """
+                }
+
+                /* Email */
+                emailext(
+                    subject: "❌ FAILED: ${JOB_NAME} #${BUILD_NUMBER}",
+                    to: "chengdevith5@gmail.com",
+                    mimeType: 'text/html',
+                    body: """
+                    <h2 style="color:red;">Build Failed ❌</h2>
+                    <p><b>Project:</b> JobFinder Frontend</p>
+                    <p><b>Job:</b> ${JOB_NAME}</p>
+                    <p><b>Build:</b> #${BUILD_NUMBER}</p>
+                    <p><a href="${BUILD_URL}">Check Logs</a></p>
+                    """
+                )
+
+                /* Discord */
+                withCredentials([
+                    string(credentialsId: 'DISCORD_WEBHOOK_URL', variable: 'DISCORD_WEBHOOK')
+                ]) {
+                    sh """
+                    curl -H "Content-Type: application/json" -X POST \
+                    -d '{
+                        "username": "Jenkins",
+                        "content": "❌ **Job FAILED** 💥\\n\\n\
+                    **Project:** JobFinder Frontend\\n\
+                    **Job:** ${JOB_NAME}\\n\
+                    **Build:** #${BUILD_NUMBER}\\n\
+                    🔗 ${BUILD_URL}"
+                                }' \
+                    ${DISCORD_WEBHOOK}
+                    """
+                }
             }
     }
     
