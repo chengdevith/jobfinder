@@ -10,13 +10,6 @@ pipeline {
     tools {
         nodejs 'node-v24-lts'
     }
-    stages {
-        stage('Clone') {
-            steps {
-                git branch: 'main', url: 'https://github.com/chengdevith/jobfinder.git'
-                sh 'ls -lrt'
-            }
-        }
         stage('Run Test') {
             steps {
                 sh """
@@ -113,7 +106,26 @@ pipeline {
                 <p><b>Build:</b> #${BUILD_NUMBER}</p>
                 <p><a href="${BUILD_URL}">View Build</a></p>
                 """
-            )
+                )
+                withCredentials([
+                    string(credentialsId: 'DISCORD_WEBHOOK_URL', variable: 'DISCORD_WEBHOOK')
+                ]) {
+                    sh """
+                    curl -H "Content-Type: application/json" \
+                        -X POST \
+                        -d '{
+                        "username": "Jenkins",
+                        "content": "✅ **Job SUCCESS** 🚀\\n\\n\
+                        **Project:** JobFinder Frontend\\n\
+                        **Job:** ${JOB_NAME}\\n\
+                        **Build:** #${BUILD_NUMBER}\\n\
+                        **SonarQube:** Quality Gate PASSED 🎯\\n\
+                        🔗 ${BUILD_URL}"
+                                }' \
+                                ${DISCORD_WEBHOOK}
+                    """
+                }
+
             }
     }
     
