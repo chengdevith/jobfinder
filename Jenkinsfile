@@ -23,6 +23,7 @@ pipeline {
                         echo "Skip Run Test stage"
                     }
                 }
+            }
         }
         stage('SonarQube Analysis') {
             steps {
