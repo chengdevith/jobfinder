@@ -2,22 +2,27 @@
 
 pipeline {
     agent any
-
-    parameters {
-        booleanParam(name: 'NEXT', defaultValue: true, description: 'Next.js project')
-        booleanParam(name: 'SPRING', defaultValue: false, description: 'Spring project')
-        choice(name: 'ENV', choices: ['dev', 'prod'], description: 'Environment')
+    environment {
+        FULL_IMAGE = "benz3528/jobfinder:latest"
     }
-
     stages {
         stage('Build') {
             steps {
                 buildDocker(
-                    image: "jobfinder:${BUILD_NUMBER}",
-                    env: params.ENV,
-                    next: params.NEXT,
-                    spring: params.SPRING
+                    image: FULL_IMAGE
                 )
+            }
+        }
+        stage('Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'DOCKERHUB-CREDENTIAL', passwordVariable: 'DH_PASSWORD', usernameVariable: 'DH_USERNAME')]) 
+                {
+                    sh """
+                        echo "$DH_PASSWORD" | docker login -u "$DH_USERNAME" --password-stdin
+                        docker push ${FULL_IMAGE}
+                        docker logout
+                    """
+                }
             }
         }
     }
