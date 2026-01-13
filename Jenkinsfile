@@ -9,7 +9,7 @@ pipeline {
         stage('Build') {
             steps {
                 buildDocker(
-                    image: ${FULL_IMAGE}
+                    image: FULL_IMAGE
                 )
             }
         }
