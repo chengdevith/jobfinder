@@ -10,8 +10,8 @@ pipeline {
             steps {
                 buildDocker(
                     image: FULL_IMAGE
-                    next: params.NEXT,
-                    spring: params.SPRING
+                    next: "${params.isNext}"
+                    spring: "${params.isSpring}"
                 )
             }
         }
